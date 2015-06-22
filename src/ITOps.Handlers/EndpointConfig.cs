@@ -39,7 +39,11 @@ namespace ITOps.Handlers
             config.UseContainer<StructureMapBuilder>(cfg => cfg.ExistingContainer(container));
 
             //config.UsePersistence<InMemoryPersistence>();
+
+            //based on http://docs.particular.net/nservicebus/nhibernate/configuration#configuringnhibernate-v5_2_x-N
+            //Use NHibernate for all persistence concerns
             config.UsePersistence<NHibernatePersistence>();
+
             config.UseSerialization<XmlSerializer>();
             config.EnableFeature<TimeoutManager>();
             config.EnableFeature<SecondLevelRetries>();
