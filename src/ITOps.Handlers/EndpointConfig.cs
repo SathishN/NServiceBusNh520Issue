@@ -3,12 +3,9 @@ using System.Data.SqlClient;
 using System.Reflection;
 using ITOps.Messages;
 using ITOps.Messages.Commands;
-using NHibernate.Cfg;
 using NServiceBus.Features;
 using NServiceBus.Logging;
 using NServiceBus.Persistence;
-using StructureMap;
-using NServiceBus;
 
 namespace ITOps.Handlers 
 {
@@ -26,8 +23,6 @@ namespace ITOps.Handlers
 
             LogManager.Use<NServiceBus.Log4Net.Log4NetFactory>();
 
-            var container = new Container(cfg => { });
-
             config.AssembliesToScan(new [] {typeof (NotificationCommand).Assembly, typeof (ConsoleNotificationHandler).Assembly});
 
             config.EndpointName("ITOps.Notification");
@@ -35,14 +30,10 @@ namespace ITOps.Handlers
                 .DefiningMessagesAs(t => t.Namespace != null && t.Namespace.Contains("Messages.Messages"))
                 .DefiningEventsAs(t => t.Namespace != null && t.Namespace.Contains("Messages.Events"))
                 .DefiningCommandsAs(t => t.Namespace != null && t.Namespace.Contains("Messages.Commands"));
-            
-            config.UseContainer<StructureMapBuilder>(cfg => cfg.ExistingContainer(container));
 
             //config.UsePersistence<InMemoryPersistence>();
 
-            //based on http://docs.particular.net/nservicebus/nhibernate/configuration#configuringnhibernate-v5_2_x-N
-            //Use NHibernate for all persistence concerns
-            config.UsePersistence<NHibernatePersistence>();
+            config.UsePersistence<RavenDBPersistence>();
 
             config.UseSerialization<XmlSerializer>();
             config.EnableFeature<TimeoutManager>();
